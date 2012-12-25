@@ -1,4 +1,4 @@
-'From Cuis 4.1 of 12 December 2012 [latest update: #1517] on 20 December 2012 at 12:51:22 pm'!
+'From Cuis 4.1 of 12 December 2012 [latest update: #1517] on 25 December 2012 at 6:23:02 pm'!
 'Description Please enter a description for this package '!
 !classDefinition: #RxMatcherTest category: #'Regex-Tests-Core'!
 TestCase subclass: #RxMatcherTest
@@ -33,14 +33,36 @@ compileRegex: aString	"Compile the regex and answer the matcher, or answer nil 
 !RxMatcherTest methodsFor: 'testing-henry' stamp: 'lr 1/15/2010 19:46'!
 henryReadme	self error: 'The tests in this category are based on the ones in Henry Spencer''s regexp.c package.'! !
 
-!RxMatcherTest methodsFor: 'accessing' stamp: 'lr 1/15/2010 18:47'!
-matcherClass	^ RxMatcher! !
+!RxMatcherTest methodsFor: 'accessing' stamp: 'gsa 12/22/2012 12:25'!
+matcherClass
+	^ RxMatcher! !
 
 !RxMatcherTest methodsFor: 'accessing' stamp: 'lr 1/15/2010 19:39'!
 parserClass	^ RxParser! !
 
-!RxMatcherTest methodsFor: 'utilties' stamp: 'TestRunner 1/15/2010 21:02'!
-runMatcher: aMatcher with: aString expect: aBoolean withSubexpressions: anArray	| copy got |	copy := aMatcher		copy: aString		translatingMatchesUsing: [ :each | each ].	self 		assert: copy = aString		description: 'Copying: expected ' , aString printString , ', but got ' , copy printString.	got := aMatcher search: aString.	self		assert: got = aBoolean 		description: 'Searching: expected ' , aBoolean printString , ', but got ' , got printString.	(anArray isNil or: [ aMatcher supportsSubexpressions not ])		ifTrue: [ ^ self ].	1 to: anArray size by: 2 do: [ :index |		| sub subExpect subGot |		sub := anArray at: index.		subExpect := anArray at: index + 1.		subGot := aMatcher subexpression: sub.		self			assert: subExpect = subGot			description: 'Subexpression ' , sub printString , ': expected ' , subExpect printString , ', but got ' , subGot printString ]! !
+!RxMatcherTest methodsFor: 'utilties' stamp: 'gsa 12/22/2012 12:26'!
+runMatcher: aMatcher with: aString expect: aBoolean withSubexpressions: anArray
+	| copy got |
+	copy := aMatcher
+		copy: aString
+		translatingMatchesUsing: [ :each | each ].
+	self 
+		assert: copy = aString
+		description: 'Copying: expected ' , aString printString , ', but got ' , copy printString.
+	got := aMatcher search: aString.
+	self
+		assert: got = aBoolean 
+		description: 'Searching: expected ' , aBoolean printString , ', but got ' , got printString.
+	(anArray isNil or: [ aMatcher supportsSubexpressions not ])
+		ifTrue: [ ^ self ].
+	1 to: anArray size by: 2 do: [ :index |
+		| sub subExpect subGot |
+		sub := anArray at: index.
+		subExpect := anArray at: index + 1.
+		subGot := aMatcher subexpression: sub.
+		self
+			assert: subExpect = subGot
+			description: 'Subexpression ' , sub printString , ': expected ' , subExpect printString , ', but got ' , subGot printString ]! !
 
 !RxMatcherTest methodsFor: 'utilties' stamp: 'lr 1/15/2010 19:31'!
 runRegex: anArray	"Run a clause anArray against a set of tests. Each clause is an array with a regex source string followed by sequence of 3-tuples. Each three-element group is one test to try against the regex, and includes: 1) test string; 2) expected result; 3) expected subexpression as an array of (index, substring), or nil."	| source matcher |	source := anArray first.	matcher := self compileRegex: source.	matcher isNil		ifTrue: [			(anArray at: 2) isNil				ifFalse: [ self signalFailure: 'Compilation failed, should have succeeded: ' , source printString ] ]		ifFalse: [			(anArray at: 2) isNil				ifTrue: [ self signalFailure: 'Compilation succeeded, should have failed: ' , source printString ]				ifFalse: [					2 to: anArray size by: 3 do: [ :index | 						self 							runMatcher: matcher							with: (anArray at: index)							expect: (anArray at: index + 1)							withSubexpressions: (anArray at: index + 2) ] ] ]! !
@@ -57,23 +79,59 @@ testCopyReplacingMatches	"See that the match context is preserved while copying
 !RxMatcherTest methodsFor: 'testing-protocol' stamp: 'hfm 4/2/2010 13:52'!
 testCopyTranslatingMatches	| matcher |	matcher := self matcherClass forString: '\w+'.	self assert: (matcher copy: 'now is  the   time    ' translatingMatchesUsing: [ :each | each reversed ])		= 'won si  eht   emit    '! !
 
-!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/20/2012 10:38'!
-testEmptyStringAtBeginningOfLine	| matcher |	matcher := self matcherClass forString: '^'.	self		assert: (matcher copy: 'foo1 bar1' , String crString , 'foo2 bar2' replacingMatchesWith: '*')			= ('*foo1 bar1' , String crString , '*foo2 bar2')		description: 'An empty string at the beginning of a line'! !
+!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/20/2012 20:02'!
+testEmptyStringAtBeginningOfLine
+	| matcher |
+	matcher := self matcherClass forString: '^'.
+	self
+		assert: (matcher copy: 'foo1 bar1' , String crString , 'foo2 bar2' replacingMatchesWith: '*')
+			= ('*foo1 bar1' , String crString , '*foo2 bar2')
+		description: 'An empty string at the beginning of a line'! !
 
-!RxMatcherTest methodsFor: 'testing-empty' stamp: 'lr 1/15/2010 20:05'!
-testEmptyStringAtBeginningOfWord	| matcher |	matcher := self matcherClass forString: '\<'.	self		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')			= '*foo *bar'		description: 'An empty string at the beginning of a word'! !
+!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/22/2012 12:34'!
+testEmptyStringAtBeginningOfWord
+	| matcher |
+	matcher := self matcherClass forString: '\<'.
+	self
+		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')
+			= '*foo *bar'
+		description: 'An empty string at the beginning of a word'! !
 
-!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/20/2012 10:49'!
-testEmptyStringAtEndOfLine	| matcher |	matcher := self matcherClass forString: '$'.	self		assert: (matcher copy: 'foo1 bar1' , String crString , 'foo2 bar2' replacingMatchesWith: '*')			= ('foo1 bar1*', String crString , 'foo2 bar2*')		description: 'An empty string at the end of a line'! !
+!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/20/2012 20:02'!
+testEmptyStringAtEndOfLine
+	| matcher |
+	matcher := self matcherClass forString: '$'.
+	self
+		assert: (matcher copy: 'foo1 bar1' , String crString , 'foo2 bar2' replacingMatchesWith: '*')
+			= ('foo1 bar1*', String crString , 'foo2 bar2*')
+		description: 'An empty string at the end of a line'! !
 
-!RxMatcherTest methodsFor: 'testing-empty' stamp: 'TestRunner 1/15/2010 21:18'!
-testEmptyStringAtEndOfWord	| matcher |	matcher := self matcherClass forString: '\>'.	self		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')			= 'foo* bar*'		description: 'An empty string at the end of a word'! !
+!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/22/2012 12:34'!
+testEmptyStringAtEndOfWord
+	| matcher |
+	matcher := self matcherClass forString: '\>'.
+	self
+		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')
+			= 'foo* bar*'
+		description: 'An empty string at the end of a word'! !
 
-!RxMatcherTest methodsFor: 'testing-empty' stamp: 'TestRunner 1/15/2010 21:18'!
-testEmptyStringAtWordBoundary	| matcher |	matcher := self matcherClass forString: '\b'.	self		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')			= '*foo* *bar*'		description: 'An empty string at a word boundary'! !
+!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/22/2012 12:34'!
+testEmptyStringAtWordBoundary
+	| matcher |
+	matcher := self matcherClass forString: '\b'.
+	self
+		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')
+			= '*foo* *bar*'
+		description: 'An empty string at a word boundary'! !
 
-!RxMatcherTest methodsFor: 'testing-empty' stamp: 'TestRunner 1/15/2010 21:19'!
-testEmptyStringNotAtWordBoundary	| matcher |	matcher := self matcherClass forString: '\B'.	self		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')			= 'f*o*o b*a*r'		description: 'An empty string not at a word boundary'! !
+!RxMatcherTest methodsFor: 'testing-empty' stamp: 'gsa 12/22/2012 12:35'!
+testEmptyStringNotAtWordBoundary
+	| matcher |
+	matcher := self matcherClass forString: '\B'.
+	self
+		assert: (matcher copy: 'foo bar' replacingMatchesWith: '*')
+			= 'f*o*o b*a*r'
+		description: 'An empty string not at a word boundary'! !
 
 !RxMatcherTest methodsFor: 'testing-henry' stamp: 'lr 1/15/2010 19:46'!
 testHenry001	self runRegex: #('abc'		'abc' true (1 'abc')		'xbc' false nil		'axc' false nil		'abx' false nil		'xabcy' true (1 'abc')		'ababc' true (1 'abc'))! !
@@ -525,8 +583,14 @@ testRegex003	self runRegex: #('a\W+c'		' abb_bbc ' false nil		'abb-bc' false 
 !RxMatcherTest methodsFor: 'testing' stamp: 'lr 4/23/2010 09:01'!
 testRegex004	self runRegex: #(':isVowel:'		'aei' true nil		'xyz' false nil)! !
 
-!RxMatcherTest methodsFor: 'testing-extensions' stamp: 'lr 4/23/2010 08:50'!
-testStringAllRangesOfRegexMatches	| result |	result := 'aabbcc' allRangesOfRegexMatches: 'b+'.	self assert: result size = 1.	self assert: result first first = 3.	self assert: result first last = 4	! !
+!RxMatcherTest methodsFor: 'testing-extensions' stamp: 'gsa 12/22/2012 12:26'!
+testStringAllRangesOfRegexMatches
+	| result |
+	result := 'aabbcc' allRangesOfRegexMatches: 'b+'.
+	self assert: result size = 1.
+	self assert: result first first = 3.
+	self assert: result first last = 4
+	! !
 
 !RxMatcherTest methodsFor: 'testing-extensions' stamp: 'lr 4/23/2010 08:50'!
 testStringAllRegexMatches	| result |	result := 'aabbcc' allRegexMatches: 'b+'.	self assert: result size = 1.	self assert: result first = 'bb'! !
