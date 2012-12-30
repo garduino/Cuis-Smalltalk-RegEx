@@ -1,4 +1,4 @@
-'From Cuis 4.1 of 12 December 2012 [latest update: #1517] on 20 December 2012 at 12:46:39 pm'!
+'From Cuis 4.1 of 12 December 2012 [latest update: #1524] on 30 December 2012 at 6:00:39 pm'!
 'Description Please enter a description for this package '!
 !classDefinition: #RegexError category: #'Regex-Core-Exceptions'!
 Error subclass: #RegexError
