@@ -3,11 +3,10 @@ Cuis-RegEx
 
 Regular Expressions for Cuis
 
-To install in a Cuis 4.1 image:
+Tested in Cuis 4.2 rev 2984
 
-1. Install Cuis-CompatibilityWithOtherSmalltalks
-2. Install RegEx-Core and RegEx-Tests
+To install in a Cuis 4.2 image, open a Workspace and DoIt:
 
-The 188 tests are green. 
-
-Last Update: 25/12/2012.
+````Smalltalk
+   Feature require: #'Regex-Tests-Core'.
+````
