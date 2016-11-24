@@ -1,24 +1,24 @@
 'From Cuis 5.0 of 7 November 2016 [latest update: #2974] on 22 November 2016 at 1:04:01 pm'!
 'Description Please enter a description for this package '!
-!provides: 'Regex-Tests' 1 1!
-!requires: 'Regex-Core' 1 1 nil!
-!classDefinition: #RxMatcherTest category: #'Regex-Tests-Core'!
+!provides: 'RegEx-Tests' 1 1!
+!requires: 'RegEx-Core' 1 1 nil!
+!classDefinition: #RxMatcherTest category: #'RegEx-Tests-Core'!
 TestCase subclass: #RxMatcherTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Regex-Tests-Core'!
-!classDefinition: 'RxMatcherTest class' category: #'Regex-Tests-Core'!
+	category: 'RegEx-Tests-Core'!
+!classDefinition: 'RxMatcherTest class' category: #'RegEx-Tests-Core'!
 RxMatcherTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #RxParserTest category: #'Regex-Tests-Core'!
+!classDefinition: #RxParserTest category: #'RegEx-Tests-Core'!
 TestCase subclass: #RxParserTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'Regex-Tests-Core'!
-!classDefinition: 'RxParserTest class' category: #'Regex-Tests-Core'!
+	category: 'RegEx-Tests-Core'!
+!classDefinition: 'RxParserTest class' category: #'RegEx-Tests-Core'!
 RxParserTest class
 	instanceVariableNames: ''!
 

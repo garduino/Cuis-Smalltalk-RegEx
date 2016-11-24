@@ -1,6 +1,6 @@
 'From Cuis 5.0 of 7 November 2016 [latest update: #2974] on 22 November 2016 at 1:16:44 pm'!
 'Description Please enter a description for this package '!
-!provides: 'Regex-Core' 1 3!
+!provides: 'RegEx-Core' 1 3!
 !requires: 'Cuis-Base' 50 2974 nil!
 !requires: 'SqueakCompatibility' 1 27 nil!
 !classDefinition: #RegexError category: #'Regex-Core-Exceptions'!
