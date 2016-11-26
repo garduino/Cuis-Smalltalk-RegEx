@@ -1,7 +1,7 @@
 'From Cuis 5.0 of 7 November 2016 [latest update: #2984] on 25 November 2016 at 1:39:36 pm'!
 'Description Please enter a description for this package '!
-!provides: 'RegEx-Tests' 1 2!
-!requires: 'RegEx-Core' 1 1 nil!
+!provides: 'Regex-Tests' 1 2!
+!requires: 'Regex-Core' 1 1 nil!
 !classDefinition: #RxMatcherTest category: #'RegEx-Tests-Core'!
 TestCase subclass: #RxMatcherTest
 	instanceVariableNames: ''

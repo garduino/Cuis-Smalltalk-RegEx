@@ -4,7 +4,7 @@ See RegEx-Core RxParser class DOCUMENTATION methods and examples in Regex-Tests-
 Copyright is in RegEx-Core RxParser class DOCUMENTATION f:boringStuff:
   ''The Regular Expression Matcher (``The Software'''') is Copyright (C) 1996, 1999 Vassili Bykov. '' 
  '!
-!provides: 'RegEx-Core' 1 7!
+!provides: 'Regex-Core' 1 7!
 !requires: 'Cuis-Base' 50 2974 nil!
 !requires: 'SqueakCompatibility' 1 27 nil!
 !classDefinition: #RegexError category: #'Regex-Core-Exceptions'!
