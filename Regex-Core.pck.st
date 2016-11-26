@@ -1,6 +1,10 @@
-'From Cuis 5.0 of 7 November 2016 [latest update: #2974] on 22 November 2016 at 1:16:44 pm'!
-'Description Please enter a description for this package '!
-!provides: 'RegEx-Core' 1 3!
+'From Cuis 5.0 of 7 November 2016 [latest update: #2984] on 25 November 2016 at 4:37:34 pm'!
+'Description Reguar expression matching.
+See RegEx-Core RxParser class DOCUMENTATION methods and examples in Regex-Tests-Core.
+Copyright is in RegEx-Core RxParser class DOCUMENTATION f:boringStuff:
+  ''The Regular Expression Matcher (``The Software'''') is Copyright (C) 1996, 1999 Vassili Bykov. '' 
+ '!
+!provides: 'RegEx-Core' 1 7!
 !requires: 'Cuis-Base' 50 2974 nil!
 !requires: 'SqueakCompatibility' 1 27 nil!
 !classDefinition: #RegexError category: #'Regex-Core-Exceptions'!
@@ -581,10 +585,10 @@ addChar: aChar
 
 	elements add: (RxsCharacter with: aChar)! !
 
-!RxCharSetParser methodsFor: 'parsing' stamp: 'vb 4/11/09 21:56'!
+!RxCharSetParser methodsFor: 'parsing' stamp: 'KenD 11/25/2016 15:53:46'!
 addRangeFrom: firstChar to: lastChar
 
-	firstChar asInteger > lastChar asInteger ifTrue:
+	firstChar numericValue > lastChar numericValue ifTrue:
 		[RxParser signalSyntaxException: ' bad character range'].
 	elements add: (RxsRange from: firstChar to: lastChar)! !
 
@@ -675,7 +679,7 @@ canStartMatch: aCharacter in: aMatcher
 	aCharacter isNil ifTrue: [^true].
 	^testBlock == nil or: [testBlock value: aCharacter value: aMatcher]! !
 
-!RxMatchOptimizer methodsFor: 'accessing' stamp: 'KenD 11/22/2016 13:08:58'!
+!RxMatchOptimizer methodsFor: 'accessing' stamp: 'KenD 11/25/2016 15:56:12'!
 conditionTester
 	"#any condition is filtered at the higher level;
 	it cannot appear among the conditions here."
@@ -695,11 +699,11 @@ conditionTester
 	"More than one condition. Capture them as an array in scope."
 	matchCondition := conditions asArray.
 	^[:c :matcher |
-		matchCondition includes:
+		matchCondition anySatisfy: "was #includes:"
 			[:conditionSelector |
 			matcher perform: conditionSelector]]! !
 
-!RxMatchOptimizer methodsFor: 'private' stamp: 'KenD 11/22/2016 13:09:05'!
+!RxMatchOptimizer methodsFor: 'private' stamp: 'KenD 11/25/2016 15:58:02'!
 determineTestMethod
 	"Answer a block closure that will work as a can-match predicate.
 	Answer nil if no viable optimization is possible (too many chars would
@@ -717,7 +721,8 @@ determineTestMethod
 	testers isEmpty ifTrue: [^nil].
 	testers size = 1 ifTrue: [^testers first].
 	testers := testers asArray.
-	^[:char :matcher | testers includes: [:t | t value: char value: matcher]]! !
+	"^[:char :matcher | testers includes: [:t | t value: char value: matcher]]"
+	^ [:char :matcher | testers anySatisfy: [:t | t value: char value: matcher]]! !
 
 !RxMatchOptimizer methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 initialize: aRegex ignoreCase: aBoolean 
@@ -941,10 +946,10 @@ allocateMarker
 	markerCount := markerCount + 1.
 	^markerCount! !
 
-!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
+!RxMatcher methodsFor: 'testing' stamp: 'KenD 11/25/2016 16:06:50'!
 atBeginningOfLine
 
-	^self position = 0 or: [self lastChar = Cr]! !
+	^self position = 0 or: [self lastChar isLineSeparator]! !
 
 !RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
 atBeginningOfWord
@@ -957,10 +962,10 @@ atEnd
 
 	^stream atEnd! !
 
-!RxMatcher methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+!RxMatcher methodsFor: 'testing' stamp: 'KenD 11/25/2016 16:07:03'!
 atEndOfLine
 
-	^self atEnd or: [stream peek = Cr]! !
+	^self atEnd or: [stream peek isLineSeparator]! !
 
 !RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
 atEndOfWord
@@ -1382,13 +1387,16 @@ supportsSubexpressions
 
 	^true! !
 
-!RxMatcher methodsFor: 'double dispatch' stamp: 'vb 4/11/09 21:56'!
+!RxMatcher methodsFor: 'double dispatch' stamp: 'KenD 11/25/2016 16:26:52'!
 syntaxAny
 	"Double dispatch from the syntax tree. 
 	Create a matcher for any non-null character."
 
 	^RxmPredicate new
-		predicate: [:char | char asInteger ~= 0]! !
+		predicate: [:char | char numericValue ~= 0]
+	"?? Could match non-whitespace character
+		predicate: [:char | char isSeparator not]
+	"! !
 
 !RxMatcher methodsFor: 'double dispatch' stamp: 'vb 4/11/09 21:56'!
 syntaxBeginningOfLine
@@ -1404,7 +1412,7 @@ syntaxBeginningOfWord
 
 	^RxmSpecial new beBeginningOfWord! !
 
-!RxMatcher methodsFor: 'double dispatch' stamp: 'PeterHugossonMiller 9/3/2009 11:08'!
+!RxMatcher methodsFor: 'double dispatch' stamp: 'KenD 11/25/2016 16:28:11'!
 syntaxBranch: branchNode
 	"Double dispatch from the syntax tree. 
 	Branch node is a link in a chain of concatenated pieces.
@@ -1415,7 +1423,7 @@ syntaxBranch: branchNode
 		ifTrue: [^branchNode piece dispatchTo: self].
 	"Optimization: glue a sequence of individual characters into a single string to match."
 	branchNode piece isAtomic ifTrue:
-		[result := (String new: 40) writeStream.
+		[result := WriteStream on: (String new: 40).
 		next := branchNode tryMergingInto: result.
 		result := result contents.
 		result size > 1 ifTrue: "worth merging"
@@ -3152,10 +3160,10 @@ enumerableSetIgnoringCase: aBoolean
 			[each enumerateTo: set ignoringCase: aBoolean]].
 	^set! !
 
-!RxsCharSet methodsFor: 'accessing' stamp: 'KenD 11/22/2016 13:09:30'!
+!RxsCharSet methodsFor: 'accessing' stamp: 'KenD 11/25/2016 16:32:49'!
 hasPredicates
 
-	^elements includes: [:some | some isEnumerable not]! !
+	^elements anySatisfy: [:some | some isEnumerable not]! !
 
 !RxsCharSet methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 initializeElements: aCollection negated: aBoolean

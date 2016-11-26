@@ -1,6 +1,6 @@
-'From Cuis 5.0 of 7 November 2016 [latest update: #2974] on 22 November 2016 at 1:04:01 pm'!
+'From Cuis 5.0 of 7 November 2016 [latest update: #2984] on 25 November 2016 at 1:39:36 pm'!
 'Description Please enter a description for this package '!
-!provides: 'RegEx-Tests' 1 1!
+!provides: 'RegEx-Tests' 1 2!
 !requires: 'RegEx-Core' 1 1 nil!
 !classDefinition: #RxMatcherTest category: #'RegEx-Tests-Core'!
 TestCase subclass: #RxMatcherTest
@@ -1021,6 +1021,16 @@ testRegex004
 	self runRegex: #(':isVowel:'
 		'aei' true nil
 		'xyz' false nil)! !
+
+!RxMatcherTest methodsFor: 'testing-protocol' stamp: 'KenD 11/25/2016 13:39:02'!
+testRemoveHTMLTags
+	"Remove HTML Tags"
+	
+	| regex html |
+	regex := '</?[0-9A-Za-z]+[^>]*>' asRegex.
+	html := '<a>foo<b>bar</b></a>'.
+	self assert: (regex copy: html replacingMatchesWith: '') = 'foobar'
+! !
 
 !RxMatcherTest methodsFor: 'testing-extensions' stamp: 'gsa 12/22/2012 12:26'!
 testStringAllRangesOfRegexMatches
